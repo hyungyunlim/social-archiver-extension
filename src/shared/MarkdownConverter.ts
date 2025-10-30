@@ -18,7 +18,6 @@ import type {
  */
 export class MarkdownConverter {
   private static readonly DEFAULT_TITLE_LENGTH = 50;
-  private static readonly SPECIAL_CHARS_REGEX = /([\\`*_{}[\]()#+\-.!|])/g;
 
   /**
    * Convert parsed post data to markdown

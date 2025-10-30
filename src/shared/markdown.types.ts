@@ -3,7 +3,6 @@
  */
 
 import type { Platform } from './types';
-import type { ParsedPostData } from './parser.types';
 
 /**
  * YAML frontmatter metadata

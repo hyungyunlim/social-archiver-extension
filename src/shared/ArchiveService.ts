@@ -162,12 +162,7 @@ export class ArchiveService {
    * Generate preview of archived post
    */
   generatePreview(post: ParsedPostData): string {
-    const markdown = markdownConverter.convert(post, [], {
-      includeEngagement: false,
-      includeMediaLinks: false,
-    });
-
-    // This is async but we'll handle it synchronously for preview
+    // Simple preview without full markdown conversion
     return `${post.author.name}: ${post.content.text.substring(0, 100)}...`;
   }
 

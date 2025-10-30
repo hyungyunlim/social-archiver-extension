@@ -165,7 +165,7 @@
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Obsidian Vault</h3>
 
         <div class="space-y-2">
-          <label class="text-sm text-gray-600 dark:text-gray-400">Vault Location</label>
+          <div class="text-sm text-gray-600 dark:text-gray-400">Vault Location</div>
 
           {#if settings.vaultPath}
             <div class="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded flex items-center justify-between">
@@ -193,8 +193,9 @@
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Root Folder</h3>
 
         <div class="space-y-2">
-          <label class="text-sm text-gray-600 dark:text-gray-400">Folder name inside vault</label>
+          <label for="rootFolder" class="text-sm text-gray-600 dark:text-gray-400">Folder name inside vault</label>
           <input
+            id="rootFolder"
             type="text"
             bind:value={settings.rootFolder}
             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
@@ -261,8 +262,9 @@
           <!-- Date Format -->
           {#if settings.filenameTemplate.includeDate}
             <div class="space-y-2">
-              <label class="text-sm text-gray-600 dark:text-gray-400">Date Format</label>
+              <label for="dateFormat" class="text-sm text-gray-600 dark:text-gray-400">Date Format</label>
               <select
+                id="dateFormat"
                 bind:value={settings.filenameTemplate.dateFormat}
                 class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
               >
@@ -275,8 +277,9 @@
 
           <!-- Separator -->
           <div class="space-y-2">
-            <label class="text-sm text-gray-600 dark:text-gray-400">Separator</label>
+            <label for="separator" class="text-sm text-gray-600 dark:text-gray-400">Separator</label>
             <select
+              id="separator"
               bind:value={settings.filenameTemplate.separator}
               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
             >
@@ -319,10 +322,11 @@
             <!-- Max File Size -->
             <div class="space-y-2">
               <div class="flex items-center justify-between">
-                <label class="text-sm text-gray-600 dark:text-gray-400">Max file size</label>
+                <label for="maxFileSize" class="text-sm text-gray-600 dark:text-gray-400">Max file size</label>
                 <span class="text-sm font-medium text-gray-900 dark:text-white">{settings.media.maxFileSizeMB} MB</span>
               </div>
               <input
+                id="maxFileSize"
                 type="range"
                 min="1"
                 max="50"

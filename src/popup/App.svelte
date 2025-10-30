@@ -1,135 +1,201 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import type { Post, Settings } from '@shared/types';
-  import { formatTimestamp } from '@shared/utils';
+  import { MessageType, type Message, type PlatformInfo } from '@shared/types';
+  import type { PopupView, PlatformState, ArchivingState, ArchiveResultData } from './types';
 
-  let archivedPosts: Post[] = $state([]);
-  let settings: Settings | null = $state(null);
+  import PlatformDetection from './components/PlatformDetection.svelte';
+  import ArchivingProgress from './components/ArchivingProgress.svelte';
+  import SuccessView from './components/SuccessView.svelte';
+  import ErrorView from './components/ErrorView.svelte';
+
+  // View state
+  let currentView: PopupView = $state('detection');
   let loading = $state(true);
 
+  // Platform state
+  let platformState: PlatformState = $state({
+    platform: null,
+    url: '',
+    ready: false,
+    postsDetected: 0,
+  });
+
+  // Archiving state
+  let archivingState: ArchivingState = $state({
+    status: 'idle',
+    progress: 0,
+    currentStep: '',
+  });
+
+  // Result state
+  let archiveResult: ArchiveResultData | null = $state(null);
+
+  // Error state
+  let errorMessage: string = $state('');
+
   onMount(async () => {
-    await loadData();
+    await detectPlatform();
     loading = false;
   });
 
-  async function loadData() {
+  /**
+   * Detect current platform from active tab
+   */
+  async function detectPlatform() {
     try {
-      const result = await chrome.storage.local.get(['archivedPosts', 'settings']);
-      archivedPosts = result.archivedPosts || [];
-      settings = result.settings || {
-        autoArchive: false,
-        platforms: {
-          facebook: true,
-          instagram: true,
-          linkedin: true,
-        },
-      };
+      // Get active tab
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+
+      if (!tab?.id) {
+        console.warn('No active tab found');
+        return;
+      }
+
+      // Send message to content script
+      const response: Message<PlatformInfo> = await chrome.tabs.sendMessage(tab.id, {
+        type: MessageType.GET_PLATFORM_INFO,
+      });
+
+      if (response?.payload) {
+        platformState = {
+          platform: response.payload.platform,
+          url: response.payload.url,
+          ready: response.payload.ready,
+          postsDetected: 0, // Will be updated when we detect posts
+        };
+      }
     } catch (error) {
-      console.error('Failed to load data:', error);
+      console.error('Failed to detect platform:', error);
+      platformState.ready = false;
     }
   }
 
-  async function toggleAutoArchive() {
-    if (!settings) return;
+  /**
+   * Start archiving process
+   */
+  async function startArchiving() {
+    currentView = 'archiving';
 
-    const newSettings = {
-      ...settings,
-      autoArchive: !settings.autoArchive,
+    archivingState = {
+      status: 'downloading',
+      progress: 25,
+      currentStep: 'Downloading media files...',
     };
 
-    await chrome.storage.local.set({ settings: newSettings });
-    settings = newSettings;
+    try {
+      // Simulate archiving process
+      // In real implementation, this would:
+      // 1. Parse post from current page
+      // 2. Download media
+      // 3. Convert to markdown
+      // 4. Save to vault
+
+      // Step 1: Downloading (25%)
+      await delay(1000);
+
+      // Step 2: Converting (50%)
+      archivingState = {
+        status: 'converting',
+        progress: 50,
+        currentStep: 'Converting to markdown format...',
+      };
+      await delay(1000);
+
+      // Step 3: Saving (75%)
+      archivingState = {
+        status: 'saving',
+        progress: 75,
+        currentStep: 'Saving to Obsidian vault...',
+      };
+      await delay(1000);
+
+      // Step 4: Complete (100%)
+      archivingState = {
+        status: 'complete',
+        progress: 100,
+        currentStep: 'Archiving complete!',
+      };
+      await delay(500);
+
+      // Show success view
+      archiveResult = {
+        filename: '2025-10-30 - John Doe - Sample post about technology.md',
+        path: 'Social Archive/facebook/2025/10/2025-10-30 - John Doe - Sample post about technology.md',
+        platform: platformState.platform!,
+        timestamp: new Date(),
+      };
+
+      currentView = 'success';
+    } catch (error) {
+      console.error('Archiving failed:', error);
+      errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      currentView = 'error';
+    }
   }
 
-  function getPlatformColor(platform: string): string {
-    switch (platform) {
-      case 'facebook':
-        return 'bg-facebook';
-      case 'instagram':
-        return 'bg-instagram';
-      case 'linkedin':
-        return 'bg-linkedin';
-      default:
-        return 'bg-gray-500';
-    }
+  /**
+   * Reset to detection view
+   */
+  function resetToDetection() {
+    currentView = 'detection';
+    archivingState = {
+      status: 'idle',
+      progress: 0,
+      currentStep: '',
+    };
+    archiveResult = null;
+    errorMessage = '';
+  }
+
+  /**
+   * Retry archiving after error
+   */
+  function retryArchiving() {
+    errorMessage = '';
+    startArchiving();
+  }
+
+  /**
+   * Utility delay function
+   */
+  function delay(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 </script>
 
-<main class="p-6 bg-white dark:bg-gray-900 min-h-screen">
-  <header class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-      Social Archiver
+<div class="w-96 min-h-[500px] bg-white dark:bg-gray-900">
+  <!-- Header -->
+  <header class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+    <h1 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+      <span>📚</span>
+      <span>Social Archiver</span>
     </h1>
-    <p class="text-sm text-gray-600 dark:text-gray-400">
-      Archive and preserve your social media content
-    </p>
   </header>
 
-  {#if loading}
-    <div class="flex items-center justify-center py-8">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-    </div>
-  {:else}
-    <!-- Settings Section -->
-    <section class="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-      <h2 class="text-lg font-semibold mb-3 text-gray-900 dark:text-white">Settings</h2>
-
-      {#if settings}
-        <label class="flex items-center gap-3 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={settings.autoArchive}
-            onchange={toggleAutoArchive}
-            class="w-4 h-4 text-indigo-600 rounded"
-          />
-          <span class="text-sm text-gray-700 dark:text-gray-300">
-            Auto-archive posts
-          </span>
-        </label>
-      {/if}
-    </section>
-
-    <!-- Archived Posts Section -->
-    <section>
-      <h2 class="text-lg font-semibold mb-3 text-gray-900 dark:text-white">
-        Archived Posts ({archivedPosts.length})
-      </h2>
-
-      {#if archivedPosts.length === 0}
-        <div class="text-center py-8 text-gray-500 dark:text-gray-400">
-          <p class="mb-2">No archived posts yet</p>
-          <p class="text-sm">Visit a social media site to start archiving!</p>
-        </div>
-      {:else}
-        <div class="space-y-3">
-          {#each archivedPosts as post (post.id)}
-            <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-              <div class="flex items-center gap-2 mb-2">
-                <span class={`px-2 py-1 text-xs text-white rounded ${getPlatformColor(post.platform)}`}>
-                  {post.platform}
-                </span>
-                <span class="text-xs text-gray-500 dark:text-gray-400">
-                  {formatTimestamp(new Date(post.timestamp))}
-                </span>
-              </div>
-
-              <p class="text-sm text-gray-900 dark:text-white mb-2">
-                By: {post.author}
-              </p>
-
-              <p class="text-sm text-gray-700 dark:text-gray-300 line-clamp-3">
-                {post.content}
-              </p>
-
-              {#if post.media && post.media.length > 0}
-                <div class="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                  {post.media.length} media item(s)
-                </div>
-              {/if}
-            </div>
-          {/each}
-        </div>
-      {/if}
-    </section>
-  {/if}
-</main>
+  <!-- Main Content -->
+  <main>
+    {#if loading}
+      <div class="flex items-center justify-center py-16">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      </div>
+    {:else if currentView === 'detection'}
+      <PlatformDetection
+        {platformState}
+        onStartArchive={startArchiving}
+      />
+    {:else if currentView === 'archiving'}
+      <ArchivingProgress {archivingState} />
+    {:else if currentView === 'success' && archiveResult}
+      <SuccessView
+        result={archiveResult}
+        onReset={resetToDetection}
+      />
+    {:else if currentView === 'error'}
+      <ErrorView
+        error={errorMessage}
+        onRetry={retryArchiving}
+        onReset={resetToDetection}
+      />
+    {/if}
+  </main>
+</div>

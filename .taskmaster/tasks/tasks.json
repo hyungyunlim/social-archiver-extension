@@ -476,7 +476,7 @@
           "2",
           "6"
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -536,7 +536,8 @@
             "testStrategy": "Test Obsidian deep-link functionality opens correct file, verify error state displays show appropriate messages, test retry functionality works correctly",
             "parentId": "undefined"
           }
-        ]
+        ],
+        "updatedAt": "2025-10-30T07:51:19.031Z"
       },
       {
         "id": "8",
@@ -614,9 +615,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-30T07:48:24.893Z",
+      "lastModified": "2025-10-30T07:51:19.032Z",
       "taskCount": 8,
-      "completedCount": 6,
+      "completedCount": 7,
       "tags": [
         "master"
       ]

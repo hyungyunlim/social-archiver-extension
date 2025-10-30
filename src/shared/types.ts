@@ -24,6 +24,26 @@ export interface MediaItem {
   thumbnail?: string;
 }
 
+// Message types for chrome.runtime communication
+export enum MessageType {
+  // From content script to background
+  ARCHIVE_POST = 'ARCHIVE_POST',
+  PLATFORM_DETECTED = 'PLATFORM_DETECTED',
+
+  // From popup to content script
+  GET_PLATFORM_INFO = 'GET_PLATFORM_INFO',
+  GET_PAGE_STATUS = 'GET_PAGE_STATUS',
+
+  // Responses
+  PLATFORM_INFO_RESPONSE = 'PLATFORM_INFO_RESPONSE',
+  PAGE_STATUS_RESPONSE = 'PAGE_STATUS_RESPONSE',
+}
+
+export interface Message<T = any> {
+  type: MessageType;
+  payload?: T;
+}
+
 export interface ArchiveRequest {
   postId: string;
   platform: Platform;
@@ -33,6 +53,18 @@ export interface ArchiveResponse {
   success: boolean;
   postId?: string;
   error?: string;
+}
+
+export interface PlatformInfo {
+  platform: Platform | null;
+  url: string;
+  ready: boolean;
+}
+
+export interface PageStatus {
+  platform: Platform | null;
+  postsDetected: number;
+  ready: boolean;
 }
 
 export interface StorageData {

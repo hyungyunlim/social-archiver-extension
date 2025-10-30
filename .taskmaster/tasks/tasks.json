@@ -244,7 +244,7 @@
         "dependencies": [
           "1"
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -252,9 +252,10 @@
             "description": "Create vault selection service using File System Access API to allow users to choose their Obsidian vault directory",
             "dependencies": [],
             "details": "Implement window.showDirectoryPicker() with {mode: 'readwrite'} options. Create a VaultSelector service class that handles the directory picker interaction, validates the selected directory as a valid Obsidian vault (check for .obsidian folder), and manages user permission flow. Include proper error handling for user cancellation and permission denied scenarios.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test vault selection dialog appears correctly, verify permission validation, test user cancellation handling, verify vault validation logic",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-30T06:55:35.651Z"
           },
           {
             "id": 2,
@@ -264,9 +265,10 @@
               1
             ],
             "details": "Create StorageService class to handle DirectoryHandle persistence using chrome.storage.local. Implement custom serialization since DirectoryHandle cannot be directly stored. Store vault path and re-request handle on extension restart. Add handle validation to ensure stored handles are still accessible and have proper permissions.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test handle persistence across browser sessions, verify serialization/deserialization works correctly, test permission validation on restored handles",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-30T06:56:24.768Z"
           },
           {
             "id": 3,
@@ -276,9 +278,10 @@
               2
             ],
             "details": "Create FolderManager class that uses handle.getDirectoryHandle() with {create: true} to build the required folder hierarchy. Implement date-based folder organization (YYYY/MM format). Add platform-specific folder creation (Facebook, Instagram, LinkedIn). Include error handling for quota exceeded and permission issues during folder creation.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test folder structure creation for each platform, verify date-based organization works correctly, test folder creation permissions, validate error handling for quota limits",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-30T06:56:55.369Z"
           },
           {
             "id": 4,
@@ -288,9 +291,10 @@
               3
             ],
             "details": "Implement FileSaver class using FileSystemWritableFileStream for efficient file writing. Create methods for writing text content, handling large files, and managing stream lifecycle. Add proper error handling for write failures, permission issues, and stream errors. Implement file existence checking and overwrite protection.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test file writing with various content sizes, verify stream handling works correctly, test error scenarios like permission denied, validate overwrite protection logic",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-30T06:57:29.202Z"
           },
           {
             "id": 5,
@@ -300,11 +304,13 @@
               4
             ],
             "details": "Create FilenameGenerator class that formats filenames using the specified pattern. Implement character sanitization to remove/replace invalid filesystem characters (< > : \" | ? * \\). Add duplicate filename handling with numeric suffixes. Include length validation to prevent overly long filenames and ensure cross-platform compatibility.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test filename generation with various special characters, verify sanitization removes invalid characters, test duplicate handling creates unique names, validate length limits work correctly",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-30T06:59:19.930Z"
           }
-        ]
+        ],
+        "updatedAt": "2025-10-30T06:59:19.930Z"
       },
       {
         "id": "5",
@@ -601,9 +607,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-30T06:42:55.804Z",
+      "lastModified": "2025-10-30T06:59:19.931Z",
       "taskCount": 8,
-      "completedCount": 3,
+      "completedCount": 4,
       "tags": [
         "master"
       ]

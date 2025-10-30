@@ -1,7 +1,9 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { MessageType, type Message, type PlatformInfo } from '@shared/types';
+  import type { ParsedPostData } from '@shared/parser.types';
   import type { PopupView, PlatformState, ArchivingState, ArchiveResultData } from './types';
+  import { archiveService } from '@shared/ArchiveService';
 
   import PlatformDetection from './components/PlatformDetection.svelte';
   import ArchivingProgress from './components/ArchivingProgress.svelte';
@@ -78,40 +80,66 @@
   async function startArchiving() {
     currentView = 'archiving';
 
-    archivingState = {
-      status: 'downloading',
-      progress: 25,
-      currentStep: 'Downloading media files...',
-    };
-
     try {
-      // Simulate archiving process
-      // In real implementation, this would:
-      // 1. Parse post from current page
-      // 2. Download media
-      // 3. Convert to markdown
-      // 4. Save to vault
+      // Step 1: Get post data from content script
+      archivingState = {
+        status: 'downloading',
+        progress: 10,
+        currentStep: 'Parsing post from page...',
+      };
 
-      // Step 1: Downloading (25%)
-      await delay(1000);
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (!tab?.id) {
+        throw new Error('No active tab found');
+      }
 
-      // Step 2: Converting (50%)
+      // Request post data from content script
+      const response = await chrome.tabs.sendMessage(tab.id, {
+        type: MessageType.ARCHIVE_CURRENT_POST,
+      });
+
+      if (!response.success || !response.postData) {
+        throw new Error(response.error || 'Failed to parse post');
+      }
+
+      const postData = response.postData as ParsedPostData;
+      console.log('Received post data:', postData);
+
+      // Step 2: Downloading media (if any)
+      archivingState = {
+        status: 'downloading',
+        progress: 30,
+        currentStep: `Downloading ${postData.media.length} media file(s)...`,
+      };
+      await delay(500);
+
+      // Step 3: Converting to markdown
       archivingState = {
         status: 'converting',
         progress: 50,
         currentStep: 'Converting to markdown format...',
       };
-      await delay(1000);
+      await delay(300);
 
-      // Step 3: Saving (75%)
+      // Step 4: Saving to vault
       archivingState = {
         status: 'saving',
-        progress: 75,
+        progress: 70,
         currentStep: 'Saving to Obsidian vault...',
       };
-      await delay(1000);
 
-      // Step 4: Complete (100%)
+      // Actually save the file!
+      const saveResult = await archiveService.archivePost(postData, {
+        downloadMedia: true,
+        includeEngagement: true,
+        autoRename: true,
+      });
+
+      if (!saveResult.success) {
+        throw new Error(saveResult.error || 'Archive failed');
+      }
+
+      // Step 5: Complete
       archivingState = {
         status: 'complete',
         progress: 100,
@@ -121,8 +149,8 @@
 
       // Show success view
       archiveResult = {
-        filename: '2025-10-30 - John Doe - Sample post about technology.md',
-        path: 'Social Archive/facebook/2025/10/2025-10-30 - John Doe - Sample post about technology.md',
+        filename: saveResult.filename || 'unknown.md',
+        path: saveResult.path || 'unknown path',
         platform: platformState.platform!,
         timestamp: new Date(),
       };

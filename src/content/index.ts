@@ -3,6 +3,8 @@
  */
 
 import { detectPlatform, getPlatformDisplayName } from '@shared/utils';
+import { getParser } from './parsers/ParserFactory';
+import type { ParsedPostData } from '@shared/parser.types';
 import type {
   ArchiveRequest,
   ArchiveResponse,
@@ -154,6 +156,18 @@ function setupMessageListener() {
         return true;
       }
 
+      if (message.type === 'ARCHIVE_CURRENT_POST') {
+        // Parse and return the first post on the page
+        handleArchiveRequest()
+          .then((postData) => {
+            sendResponse({ success: true, postData });
+          })
+          .catch((error) => {
+            sendResponse({ success: false, error: error.message });
+          });
+        return true; // Keep channel open for async response
+      }
+
       return false;
     }
   );
@@ -265,6 +279,42 @@ function observePosts() {
   });
 
   console.log('Social Archiver: DOM observer started');
+}
+
+/**
+ * Handle archive request from popup
+ * Parse the first post on the current page
+ */
+async function handleArchiveRequest(): Promise<ParsedPostData> {
+  if (!state.platform) {
+    throw new Error('No platform detected');
+  }
+
+  console.log('Parsing posts from page for platform:', state.platform);
+
+  // Get the parser for this platform
+  const parser = getParser(state.platform);
+
+  // Get all posts on the page
+  const posts = parser.getAllPosts();
+
+  if (posts.length === 0) {
+    throw new Error('No posts found on page. Try scrolling to load posts or navigate to a post page.');
+  }
+
+  console.log(`Found ${posts.length} posts on page`);
+
+  // Return the first post
+  const firstPost = posts[0];
+
+  console.log('Parsed post:', {
+    id: firstPost.id,
+    author: firstPost.author.name,
+    contentLength: firstPost.content.text.length,
+    mediaCount: firstPost.media.length,
+  });
+
+  return firstPost;
 }
 
 /**

@@ -34,6 +34,7 @@ export enum MessageType {
   // From popup to content script
   GET_PLATFORM_INFO = 'GET_PLATFORM_INFO',
   GET_PAGE_STATUS = 'GET_PAGE_STATUS',
+  ARCHIVE_CURRENT_POST = 'ARCHIVE_CURRENT_POST',
 
   // Responses
   PLATFORM_INFO_RESPONSE = 'PLATFORM_INFO_RESPONSE',

@@ -164,7 +164,7 @@
         "dependencies": [
           "2"
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -172,9 +172,10 @@
             "description": "Define the foundational types and interfaces that all platform-specific parsers will implement",
             "dependencies": [],
             "details": "Create shared/types.ts with PostData interface containing platform, id, url, author (name, url, username), content (text, html), media array, and metadata (timestamp, likes, comments, shares). Define MediaItem interface with type, url, filename, and downloaded boolean. Create base parser abstract class with abstract methods for extracting post data, handling DOM mutations, and error recovery. Include platform detection and validation methods.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Unit tests for type validation, interface compliance checking, and base parser method signatures",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-30T06:37:21.545Z"
           },
           {
             "id": 2,
@@ -184,9 +185,10 @@
               1
             ],
             "details": "Create parsers/facebook.ts extending base parser. Implement DOM selectors for '[data-pagelet=\"FeedUnit\"]' post containers, '[data-ad-preview=\"message\"]' for content text, '[data-testid=\"story-subtitle\"]' for author information. Extract author name and profile URL, post timestamp from datetime attributes, image URLs from img elements within post containers. Handle engagement metrics from reaction/comment/share elements. Implement error handling for missing DOM elements and provide fallback selectors.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test with sample Facebook DOM structures, verify all required fields are extracted, test handling of different post types (text-only, single image, multiple images), validate error handling with malformed HTML",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-30T06:38:06.330Z"
           },
           {
             "id": 3,
@@ -196,9 +198,10 @@
               1
             ],
             "details": "Create parsers/instagram.ts extending base parser. Target '[data-testid=\"post\"]' and 'article' containers for post detection. Extract username and profile URL from header elements, caption text from content areas, timestamp from time elements. Handle image extraction from '._aatc img' selectors and carousel navigation elements. Parse hashtags and mentions within captions. Extract engagement metrics from like and comment count elements. Implement carousel detection for multi-image posts.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test single image posts, carousel posts with multiple images, text-only posts, verify hashtag and mention parsing, test engagement metric extraction accuracy",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-30T06:38:47.298Z"
           },
           {
             "id": 4,
@@ -208,9 +211,10 @@
               1
             ],
             "details": "Create parsers/linkedin.ts extending base parser. Use '.feed-shared-update-v2' selectors for post containers and '.update-components-text' for content extraction. Handle both personal posts and company posts with different author extraction logic. Extract author name, profile URL, post content, and timestamp from appropriate elements. Parse engagement metrics including reactions, comments, and reposts. Handle shared articles and document attachments by extracting metadata and links.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test personal posts, company posts, shared articles, document attachments, verify professional content formatting, test engagement metric accuracy across different post types",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-30T06:39:34.787Z"
           },
           {
             "id": 5,
@@ -222,11 +226,13 @@
               4
             ],
             "details": "Integrate MutationObserver into each parser to detect when new posts are added to the DOM through infinite scroll or dynamic loading. Configure observer to watch for childList and subtree changes on main content containers. Implement throttling to prevent excessive parsing calls during rapid DOM changes. Add post deduplication logic to avoid re-processing the same posts. Include cleanup methods to disconnect observers when content script is unloaded. Handle platform-specific infinite scroll patterns and loading indicators.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test dynamic post detection during infinite scroll, verify deduplication prevents duplicate processing, test observer cleanup on page navigation, validate performance with rapid DOM changes",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-30T06:42:55.803Z"
           }
-        ]
+        ],
+        "updatedAt": "2025-10-30T06:42:55.803Z"
       },
       {
         "id": "4",
@@ -595,9 +601,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-30T06:28:01.439Z",
+      "lastModified": "2025-10-30T06:42:55.804Z",
       "taskCount": 8,
-      "completedCount": 2,
+      "completedCount": 3,
       "tags": [
         "master"
       ]

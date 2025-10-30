@@ -7,6 +7,10 @@ import { vaultManager } from './VaultManager';
 import { folderManager } from './FolderManager';
 import { fileSaver } from './FileSaver';
 import { fileNameGenerator } from './FileNameGenerator';
+import { markdownConverter } from './MarkdownConverter';
+import { mediaDownloader } from './MediaDownloader';
+import { mediaStorageManager } from './MediaStorageManager';
+import type { MediaReference } from './markdown.types';
 
 /**
  * Options for archiving a post
@@ -14,6 +18,8 @@ import { fileNameGenerator } from './FileNameGenerator';
 export interface ArchiveOptions {
   overwrite?: boolean;
   autoRename?: boolean;
+  downloadMedia?: boolean;
+  includeEngagement?: boolean;
 }
 
 /**
@@ -35,6 +41,8 @@ export class ArchiveService {
    */
   async archivePost(post: ParsedPostData, options: ArchiveOptions = {}): Promise<ArchiveResult> {
     try {
+      const { downloadMedia = true, includeEngagement = true } = options;
+
       // Initialize vault manager
       await vaultManager.initialize();
 
@@ -69,21 +77,63 @@ export class ArchiveService {
         };
       }
 
-      // Generate filename
-      const filename = fileNameGenerator.generateFilename(post);
+      // Download and store media if requested
+      const mediaReferences: MediaReference[] = [];
+      if (downloadMedia && post.media && post.media.length > 0) {
+        for (let i = 0; i < post.media.length; i++) {
+          const mediaItem = post.media[i];
 
-      // Generate markdown content
-      const content = this.generateMarkdownContent(post);
+          // Download media
+          const downloadResult = await mediaDownloader.downloadMedia({
+            url: mediaItem.url,
+          });
 
-      // Save file
+          if (downloadResult.success && downloadResult.blob) {
+            // Store media
+            const format = mediaDownloader.detectFormat(mediaItem.url, downloadResult.blob);
+            const storageResult = await mediaStorageManager.storeMediaBinary(vaultHandle, downloadResult.blob, {
+              postId: post.id,
+              mediaIndex: i,
+              format: format ?? undefined,
+            });
+
+            if (storageResult.success && storageResult.filename) {
+              mediaReferences.push({
+                type: mediaItem.type,
+                filename: storageResult.filename,
+                originalUrl: mediaItem.url,
+                caption: mediaItem.thumbnail,
+              });
+            }
+          }
+        }
+      }
+
+      // Convert post to markdown
+      const conversionResult = await markdownConverter.convert(post, mediaReferences, {
+        includeEngagement,
+        includeMediaLinks: downloadMedia,
+      });
+
+      if (!conversionResult.success || !conversionResult.markdown) {
+        return {
+          success: false,
+          error: `Failed to convert post to markdown: ${conversionResult.error}`,
+        };
+      }
+
+      // Use generated filename or fallback
+      const filename = conversionResult.filename || fileNameGenerator.generateFilename(post);
+
+      // Save markdown file
       const saveResult = options.autoRename
         ? await fileSaver.saveFileWithAutoRename(folderResult.handle, {
             filename,
-            content,
+            content: conversionResult.markdown,
           })
         : await fileSaver.saveFile(folderResult.handle, {
             filename,
-            content,
+            content: conversionResult.markdown,
             overwrite: options.overwrite,
           });
 
@@ -109,101 +159,16 @@ export class ArchiveService {
   }
 
   /**
-   * Generate markdown content for a post
+   * Generate preview of archived post
    */
-  private generateMarkdownContent(post: ParsedPostData): string {
-    const lines: string[] = [];
+  generatePreview(post: ParsedPostData): string {
+    const markdown = markdownConverter.convert(post, [], {
+      includeEngagement: false,
+      includeMediaLinks: false,
+    });
 
-    // Frontmatter (YAML metadata)
-    lines.push('---');
-    lines.push(`platform: ${post.platform}`);
-    lines.push(`author: ${post.author.name}`);
-    if (post.author.username) {
-      lines.push(`username: ${post.author.username}`);
-    }
-    if (post.author.profileUrl) {
-      lines.push(`profile: ${post.author.profileUrl}`);
-    }
-    if (post.timestamp.parsed) {
-      lines.push(`date: ${post.timestamp.parsed.toISOString()}`);
-    }
-    lines.push(`url: ${post.urls.post}`);
-    lines.push(`archived: ${new Date().toISOString()}`);
-    if (post.metadata.postType) {
-      lines.push(`type: ${post.metadata.postType}`);
-    }
-    if (post.metadata.isSponsored) {
-      lines.push(`sponsored: true`);
-    }
-    if (post.engagement) {
-      lines.push(`likes: ${post.engagement.likes || 0}`);
-      lines.push(`comments: ${post.engagement.comments || 0}`);
-      if (post.engagement.shares) {
-        lines.push(`shares: ${post.engagement.shares}`);
-      }
-    }
-    lines.push('---');
-    lines.push('');
-
-    // Title
-    lines.push(`# ${post.author.name}'s Post`);
-    lines.push('');
-
-    // Author info
-    if (post.author.profileUrl) {
-      lines.push(`**Author:** [${post.author.name}](${post.author.profileUrl})`);
-    } else {
-      lines.push(`**Author:** ${post.author.name}`);
-    }
-    lines.push(`**Platform:** ${post.platform}`);
-    if (post.timestamp.raw) {
-      lines.push(`**Posted:** ${post.timestamp.raw}`);
-    }
-    lines.push(`**Original URL:** ${post.urls.post}`);
-    lines.push('');
-
-    // Content
-    lines.push('## Content');
-    lines.push('');
-    lines.push(post.content.text || '*No text content*');
-    lines.push('');
-
-    // Media
-    if (post.media && post.media.length > 0) {
-      lines.push('## Media');
-      lines.push('');
-      for (const media of post.media) {
-        if (media.type === 'image') {
-          lines.push(`![Image](${media.url})`);
-        } else if (media.type === 'video') {
-          lines.push(`[Video](${media.url})`);
-        }
-        lines.push('');
-      }
-    }
-
-    // Engagement
-    if (post.engagement) {
-      lines.push('## Engagement');
-      lines.push('');
-      if (post.engagement.likes) {
-        lines.push(`- **Likes:** ${post.engagement.likes}`);
-      }
-      if (post.engagement.comments) {
-        lines.push(`- **Comments:** ${post.engagement.comments}`);
-      }
-      if (post.engagement.shares) {
-        lines.push(`- **Shares:** ${post.engagement.shares}`);
-      }
-      lines.push('');
-    }
-
-    // Metadata
-    lines.push('---');
-    lines.push('');
-    lines.push('*Archived with Social Archiver*');
-
-    return lines.join('\n');
+    // This is async but we'll handle it synchronously for preview
+    return `${post.author.name}: ${post.content.text.substring(0, 100)}...`;
   }
 
   /**

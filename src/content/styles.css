@@ -1,0 +1,58 @@
+/**
+ * Content script styles
+ * These styles are injected into social media pages
+ */
+
+/* Archive button styles */
+.social-archiver-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #6366f1;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.social-archiver-button:hover {
+  background: #4f46e5;
+}
+
+.social-archiver-button:active {
+  transform: scale(0.98);
+}
+
+/* Archive indicator */
+.social-archiver-archived {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: #10b981;
+  color: white;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Loading spinner */
+.social-archiver-loading {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: social-archiver-spin 0.6s linear infinite;
+}
+
+@keyframes social-archiver-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

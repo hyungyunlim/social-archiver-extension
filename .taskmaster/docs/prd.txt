@@ -1,0 +1,606 @@
+# Social Archiver Chrome Extension - Product Requirements Document
+
+## 1. Project Overview
+
+### 1.1 Purpose
+Chrome extension that allows users to archive social media posts directly to their Obsidian vault as markdown files. This is a companion tool to the Obsidian Social Archiver plugin, enabling quick one-click archiving while browsing social media.
+
+### 1.2 Target Users
+- Obsidian users who want to save social media content
+- Content curators and researchers
+- Users who value data ownership and offline access
+
+### 1.3 Core Value Proposition
+"One-click social media archiving to your Obsidian vault - no API, no credits, completely free"
+
+## 2. Scope
+
+### 2.1 In Scope (MVP)
+- Chrome Extension with popup UI
+- Support for 3 platforms: Facebook, Instagram, LinkedIn
+- DOM-based post parsing (no external APIs)
+- Direct file saving to local Obsidian vault via File System Access API
+- Image download and local storage
+- Platform-specific folder organization
+- Settings page for vault configuration
+- Markdown formatting compatible with Obsidian Social Archiver plugin
+
+### 2.2 Out of Scope (Future Phases)
+- AI analysis features
+- Video downloads
+- Cloud sync
+- Credit/licensing system
+- TikTok, X.com, Threads support (Phase 2)
+- Bulk archiving
+- Browser sync across devices
+
+## 3. Technical Architecture
+
+### 3.1 Tech Stack
+```typescript
+{
+  "manifest": "Manifest V3",
+  "language": "TypeScript 5.0+",
+  "ui": "Svelte 5 (Runes API)",
+  "bundler": "Vite",
+  "storage": "File System Access API",
+  "styling": "Tailwind CSS"
+}
+```
+
+### 3.2 Project Structure
+```
+social-archiver-extension/
+├── manifest.json
+├── package.json
+├── tsconfig.json
+├── vite.config.ts
+├── src/
+│   ├── content/
+│   │   ├── content-script.ts
+│   │   └── parsers/
+│   │       ├── base.ts
+│   │       ├── facebook.ts
+│   │       ├── instagram.ts
+│   │       └── linkedin.ts
+│   ├── background/
+│   │   ├── background.ts
+│   │   └── file-saver.ts
+│   ├── popup/
+│   │   ├── Popup.svelte
+│   │   ├── Settings.svelte
+│   │   └── popup.html
+│   ├── shared/
+│   │   ├── types.ts
+│   │   ├── markdown-converter.ts
+│   │   └── constants.ts
+│   └── styles/
+│       └── main.css
+└── public/
+    ├── icons/
+    └── _locales/
+```
+
+### 3.3 File System Organization
+All archived posts will be saved to the user's selected Obsidian vault with the following structure:
+
+```
+{Obsidian Vault}/
+└── Social Archive/
+    ├── Facebook/
+    │   ├── 2024/
+    │   │   └── 03/
+    │   │       ├── 2024-03-15 - John Doe - Product Launch.md
+    │   │       └── attachments/
+    │   │           ├── image1.jpg
+    │   │           └── image2.jpg
+    ├── Instagram/
+    │   ├── 2024/
+    │   │   └── 03/
+    │   │       └── 2024-03-15 - @username - Travel Photo.md
+    └── LinkedIn/
+        ├── 2024/
+        │   └── 03/
+        │       └── 2024-03-15 - Jane Smith - Industry Insights.md
+```
+
+**Folder Rules:**
+- Root folder: `Social Archive/` (configurable in settings)
+- Platform subfolder: `{Platform}/` (Facebook, Instagram, LinkedIn)
+- Year subfolder: `{YYYY}/`
+- Month subfolder: `{MM}/`
+- Filename format: `{YYYY-MM-DD} - {Author Name} - {Title}.md`
+- Media folder: `attachments/` (sibling to the markdown file)
+
+## 4. Feature Requirements
+
+### 4.1 Platform Detection
+**Priority:** High
+
+**Description:**
+Automatically detect which social media platform the user is currently viewing.
+
+**Acceptance Criteria:**
+- Detect Facebook posts on facebook.com
+- Detect Instagram posts on instagram.com
+- Detect LinkedIn posts on linkedin.com
+- Show platform-specific icon in extension popup
+- Disable archive button if platform is not supported
+- Show helpful message for unsupported platforms
+
+### 4.2 Post Parsing
+
+#### 4.2.1 Facebook Parser
+**Priority:** High
+
+**Required Fields:**
+- Post URL (permalink)
+- Author name
+- Author profile URL
+- Post text content
+- Post timestamp
+- Images (all attached photos)
+- Engagement metrics (likes, comments, shares)
+
+**Technical Notes:**
+- Use DOM selectors to extract data
+- Handle multi-image posts
+- Handle text-only posts
+- Handle posts with external links
+
+#### 4.2.2 Instagram Parser
+**Priority:** High
+
+**Required Fields:**
+- Post URL (shortcode)
+- Username
+- Profile URL
+- Caption text
+- Post timestamp
+- Images/carousel photos
+- Engagement metrics (likes, comments)
+
+**Technical Notes:**
+- Handle single image posts
+- Handle carousel posts (multiple images)
+- Parse hashtags and mentions
+- Extract location if available
+
+#### 4.2.3 LinkedIn Parser
+**Priority:** High
+
+**Required Fields:**
+- Post URL
+- Author name
+- Author profile URL
+- Post text content
+- Post timestamp
+- Images
+- Engagement metrics (reactions, comments, reposts)
+
+**Technical Notes:**
+- Handle personal posts
+- Handle company posts
+- Parse article shares
+- Extract document attachments info
+
+### 4.3 Markdown Conversion
+**Priority:** High
+
+**Description:**
+Convert parsed post data into Obsidian-compatible markdown format.
+
+**Markdown Template:**
+```markdown
+---
+platform: {platform}
+archived: {ISO timestamp}
+url: {post_url}
+author: {author_name}
+author_url: {author_profile}
+date: {post_date}
+---
+
+# {Post Title}
+
+**Author:** [{author_name}]({author_url})
+**Platform:** {platform}
+**Date:** {readable_date}
+**URL:** {post_url}
+
+## Content
+
+{post_text_content}
+
+## Media
+
+![[attachments/image1.jpg]]
+![[attachments/image2.jpg]]
+
+## Engagement
+
+- 👍 Likes: {likes_count}
+- 💬 Comments: {comments_count}
+- 🔄 Shares: {shares_count}
+
+---
+*Archived with Social Archiver Extension*
+```
+
+**Acceptance Criteria:**
+- YAML frontmatter includes all metadata
+- Author links are properly formatted
+- Post content preserves line breaks and formatting
+- Images use Obsidian wiki-link syntax
+- Engagement metrics are readable
+- Hashtags remain clickable (#example)
+- Mentions remain as text (@username)
+
+### 4.4 File System Access
+**Priority:** High
+
+**Description:**
+Use File System Access API to save files directly to user's Obsidian vault.
+
+**User Flow:**
+1. User clicks "Select Vault" in settings
+2. Browser shows folder picker
+3. User selects their Obsidian vault root
+4. Extension stores directory handle
+5. Future saves automatically go to correct subfolder
+
+**Acceptance Criteria:**
+- One-time vault selection persists across sessions
+- Automatic folder creation (Social Archive/{Platform}/{Year}/{Month}/)
+- Proper error handling if vault is not accessible
+- Clear user messaging if permissions are revoked
+- Support for multiple vaults (user can change selection)
+
+### 4.5 Media Download
+**Priority:** High
+
+**Description:**
+Download images from social media posts and save them locally.
+
+**Technical Requirements:**
+- Download all images from a post
+- Save to `attachments/` folder next to markdown file
+- Generate unique filenames (avoid collisions)
+- Update markdown with correct image paths
+- Show download progress in popup UI
+
+**Filename Convention:**
+```
+attachments/
+├── {timestamp}_1.jpg
+├── {timestamp}_2.jpg
+└── {timestamp}_3.jpg
+```
+
+**Error Handling:**
+- Retry failed downloads (max 3 attempts)
+- Continue saving markdown even if images fail
+- Show warning if some images couldn't be downloaded
+- Log errors for debugging
+
+**Acceptance Criteria:**
+- All images are downloaded before saving markdown
+- Images are properly linked in markdown
+- No duplicate downloads
+- Works with CORS-protected images
+- Handles different image formats (jpg, png, webp)
+
+### 4.6 Popup UI
+**Priority:** High
+
+**Description:**
+Chrome extension popup interface for quick archiving.
+
+**Screens:**
+
+#### Main Screen
+```
+┌──────────────────────────┐
+│  Social Archiver         │
+├──────────────────────────┤
+│  📍 Facebook             │
+│  ✓ Post Detected         │
+│                          │
+│  [Archive This Post]     │
+│                          │
+│  📁 Save to:             │
+│  Social Archive/Facebook │
+│                          │
+│  [⚙️ Settings]           │
+└──────────────────────────┘
+```
+
+#### Archiving Screen
+```
+┌──────────────────────────┐
+│  Archiving...            │
+├──────────────────────────┤
+│  ⏳ Parsing post...      │
+│  ⏳ Downloading 3 images │
+│  [████░░░░░░] 40%        │
+│                          │
+│  [Cancel]                │
+└──────────────────────────┘
+```
+
+#### Success Screen
+```
+┌──────────────────────────┐
+│  ✅ Archived!            │
+├──────────────────────────┤
+│  📄 Saved to:            │
+│  Social Archive/         │
+│  Facebook/2024/03/       │
+│                          │
+│  [Open in Obsidian]      │
+│  [Archive Another]       │
+└──────────────────────────┘
+```
+
+**Acceptance Criteria:**
+- Clean, minimal design
+- Platform icon and name shown
+- Real-time progress indicator
+- Error messages are user-friendly
+- Mobile-responsive (popup resizes properly)
+
+### 4.7 Settings Page
+**Priority:** Medium
+
+**Description:**
+Configuration page for vault and save location settings.
+
+**Settings:**
+
+1. **Vault Location**
+   - Button: "Select Obsidian Vault"
+   - Display: Current vault path (or "Not configured")
+   - Action: Opens File System Access folder picker
+
+2. **Root Folder**
+   - Input: Text field with default "Social Archive"
+   - Description: "Folder name inside your vault"
+   - Validation: No special characters except dash and underscore
+
+3. **Folder Structure**
+   - Radio options:
+     - ✓ Platform/Year/Month (default)
+     - Platform only
+     - Year/Month only
+     - Flat (all in root)
+
+4. **Filename Format**
+   - Input: Text field with variables
+   - Default: `{date} - {author} - {title}`
+   - Available variables: {date}, {author}, {title}, {platform}
+
+5. **Media Settings**
+   - Checkbox: "Download images" (default: on)
+   - Checkbox: "Create attachments subfolder" (default: on)
+   - Input: Max image size (MB) - default: 10
+
+**Acceptance Criteria:**
+- Settings persist across browser restarts
+- Changes take effect immediately
+- Validation prevents invalid folder names
+- Preview shows example path based on settings
+
+### 4.8 Context Menu Integration
+**Priority:** Low (Nice to have)
+
+**Description:**
+Right-click menu option for quick archiving.
+
+**Menu Item:**
+- Text: "Archive to Obsidian"
+- Icon: Extension icon
+- Shows only on supported platforms
+- Same functionality as popup button
+
+## 5. Data Models
+
+### 5.1 PostData Interface
+```typescript
+interface PostData {
+  platform: 'facebook' | 'instagram' | 'linkedin';
+  id: string;
+  url: string;
+  author: {
+    name: string;
+    url: string;
+    username?: string;
+  };
+  content: {
+    text: string;
+    html?: string;
+  };
+  media: MediaItem[];
+  metadata: {
+    timestamp: Date;
+    likes?: number;
+    comments?: number;
+    shares?: number;
+  };
+  rawData?: any; // For debugging
+}
+
+interface MediaItem {
+  type: 'image' | 'video';
+  url: string;
+  filename: string;
+  downloaded: boolean;
+}
+```
+
+### 5.2 Extension Settings
+```typescript
+interface ExtensionSettings {
+  vaultPath: string | null;
+  rootFolder: string; // default: "Social Archive"
+  folderStructure: 'platform-year-month' | 'platform' | 'year-month' | 'flat';
+  filenameFormat: string; // default: "{date} - {author} - {title}"
+  downloadImages: boolean; // default: true
+  attachmentsSubfolder: boolean; // default: true
+  maxImageSize: number; // MB, default: 10
+}
+```
+
+## 6. User Stories
+
+### Story 1: First-time Setup
+**As a** new user
+**I want to** configure my Obsidian vault location
+**So that** archived posts are saved to the correct location
+
+**Acceptance Criteria:**
+- Extension prompts for vault selection on first use
+- Clear instructions guide the user
+- Settings are saved and don't need to be re-entered
+
+### Story 2: Quick Archive
+**As a** content curator
+**I want to** archive a post with one click
+**So that** I can quickly save interesting content while browsing
+
+**Acceptance Criteria:**
+- Click extension icon while viewing a post
+- Post is automatically detected and parsed
+- Click "Archive" button
+- Post is saved to vault within 5 seconds
+- Success confirmation is shown
+
+### Story 3: Browse Archive in Obsidian
+**As a** user
+**I want to** open the archived post in Obsidian immediately
+**So that** I can review or edit the saved content
+
+**Acceptance Criteria:**
+- "Open in Obsidian" button appears after successful archive
+- Clicking button opens the specific file in Obsidian
+- File is properly formatted and readable
+
+## 7. Non-Functional Requirements
+
+### 7.1 Performance
+- Post parsing: < 500ms
+- Image download: < 5 seconds for typical post
+- Total archive time: < 10 seconds for post with 3 images
+- Extension popup opens in < 100ms
+
+### 7.2 Reliability
+- Handle network errors gracefully
+- Retry failed image downloads
+- Never lose data (save markdown even if images fail)
+- Work offline for already-loaded posts
+
+### 7.3 Compatibility
+- Chrome 102+ (for File System Access API)
+- Edge 102+
+- Brave (Chromium-based)
+- Works with Obsidian 1.0.0+
+
+### 7.4 Security
+- No data sent to external servers
+- All processing happens locally
+- Secure storage of vault path
+- No tracking or analytics
+
+### 7.5 Privacy
+- No user data collection
+- No external API calls
+- All data stays on user's device
+- Open source code for transparency
+
+## 8. Success Metrics
+
+### 8.1 Launch Criteria (MVP)
+- [ ] Successfully archive Facebook posts
+- [ ] Successfully archive Instagram posts
+- [ ] Successfully archive LinkedIn posts
+- [ ] Images download and save correctly
+- [ ] Markdown format is Obsidian-compatible
+- [ ] Settings persist across sessions
+- [ ] No critical bugs in user testing
+
+### 8.2 Quality Metrics
+- 95% success rate for post parsing
+- 90% success rate for image downloads
+- 0 critical bugs at launch
+- < 5 seconds average archive time
+
+## 9. Future Enhancements (Post-MVP)
+
+### Phase 2 Features
+- TikTok support
+- X.com (Twitter) support
+- Threads support
+- Video downloads
+- Bulk archiving (archive entire profile/page)
+- Annotation tools (highlight/comment before saving)
+
+### Phase 3 Features
+- AI-powered summaries (optional, integration with plugin)
+- OCR for image text extraction
+- Automatic tagging based on content
+- Export to other formats (PDF, HTML)
+
+## 10. Technical Constraints
+
+### 10.1 Browser Limitations
+- File System Access API requires user gesture
+- CORS may block some image downloads
+- DOM selectors may break if platforms update UI
+- Storage quotas limit number of stored handles
+
+### 10.2 Platform Limitations
+- Social media sites may rate-limit requests
+- Anti-scraping measures may interfere
+- Login required for some content
+- Private posts cannot be archived
+
+### 10.3 Development Constraints
+- Must comply with Chrome Web Store policies
+- Cannot use eval() or remote code execution
+- Must use Manifest V3
+- Content Security Policy restrictions
+
+## 11. Risk Assessment
+
+### High Risk
+- **Platform UI changes:** Social media sites frequently update their HTML structure
+  - Mitigation: Modular parser design, easy to update selectors
+
+- **CORS blocking images:** Some images may be undownloadable
+  - Mitigation: Fallback to image URL only, show warning to user
+
+### Medium Risk
+- **File System API support:** Not all browsers support it
+  - Mitigation: Feature detection, fallback to download API
+
+- **Performance with many images:** Large posts may slow down
+  - Mitigation: Concurrent downloads, progress indicator
+
+### Low Risk
+- **User adoption:** Chrome extension may have limited reach
+  - Mitigation: Cross-promote with Obsidian plugin
+
+## 12. Glossary
+
+- **Vault:** Obsidian's term for a folder containing markdown notes
+- **File System Access API:** Browser API for reading/writing local files
+- **Manifest V3:** Latest Chrome extension specification
+- **Content Script:** JavaScript injected into web pages
+- **Background Service Worker:** Extension's background process
+- **Wiki-link:** Obsidian's link format using [[double brackets]]
+
+---
+
+**Document Version:** 1.0
+**Last Updated:** 2024-10-30
+**Author:** Product Team
+**Status:** Ready for Development

@@ -1,0 +1,600 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": "1",
+        "title": "Initialize Chrome Extension Project Structure",
+        "description": "Set up the TypeScript + Svelte 5 + Vite development environment with Manifest V3 configuration",
+        "details": "Install dependencies: typescript@5.2+, svelte@5.0+, @sveltejs/vite-plugin-svelte@3.0+, vite@4.5+, tailwindcss@3.3+, @types/chrome@0.0.248+. Create manifest.json with Manifest V3 spec including content_scripts, background service worker, host_permissions for facebook.com, instagram.com, linkedin.com. Set up vite.config.ts with Svelte plugin and Chrome extension build configuration. Configure tsconfig.json with DOM types and Chrome API types. Create src/ directory structure with content/, background/, popup/, shared/ folders as specified in PRD.",
+        "testStrategy": "Verify extension loads in Chrome developer mode, all TypeScript files compile without errors, Vite builds successfully create dist/ folder with proper manifest.json",
+        "priority": "high",
+        "dependencies": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Install and configure project dependencies",
+            "description": "Install all required dependencies for TypeScript, Svelte 5, Vite, TailwindCSS, and Chrome extension development",
+            "dependencies": [],
+            "details": "Install typescript@5.2+, svelte@5.0+, @sveltejs/vite-plugin-svelte@3.0+, vite@4.5+, tailwindcss@3.3+, @types/chrome@0.0.248+, and related development dependencies. Update package.json with proper scripts for development and build processes. Configure npm scripts for dev server, build, and type checking.",
+            "status": "done",
+            "testStrategy": "Verify all dependencies install without conflicts, check package.json contains all required packages with correct versions, ensure npm scripts execute without errors",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-30T05:30:59.439Z"
+          },
+          {
+            "id": 2,
+            "title": "Create Manifest V3 configuration file",
+            "description": "Generate manifest.json with Chrome Extension Manifest V3 specification including permissions and content scripts",
+            "dependencies": [],
+            "details": "Create manifest.json with manifest_version: 3, proper extension metadata, content_scripts configuration for facebook.com, instagram.com, linkedin.com domains, background service worker registration, host_permissions for target social media platforms, and required API permissions for storage and file system access.",
+            "status": "done",
+            "testStrategy": "Validate manifest.json against Manifest V3 schema, verify extension loads in Chrome developer mode without warnings, confirm permissions are correctly declared",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-30T05:31:17.862Z"
+          },
+          {
+            "id": 3,
+            "title": "Configure Vite build system for Chrome extension",
+            "description": "Set up vite.config.ts with Svelte plugin and Chrome extension-specific build configuration",
+            "dependencies": [
+              1
+            ],
+            "details": "Create vite.config.ts with @sveltejs/vite-plugin-svelte, configure build.rollupOptions for multiple entry points (content script, background, popup), set up proper asset handling for Chrome extension structure, configure build output to dist/ directory with correct file structure for extension loading.",
+            "status": "done",
+            "testStrategy": "Verify Vite builds successfully create dist/ folder with proper manifest.json and bundled files, test development server runs without errors, confirm hot reload works for Svelte components",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-30T05:31:36.798Z"
+          },
+          {
+            "id": 4,
+            "title": "Configure TypeScript and TailwindCSS setup",
+            "description": "Set up tsconfig.json with Chrome API types and configure TailwindCSS for styling",
+            "dependencies": [
+              1
+            ],
+            "details": "Create tsconfig.json with DOM types, Chrome API types, proper module resolution for Vite and Svelte. Configure TailwindCSS with tailwind.config.js, set up PostCSS configuration, create base CSS file with Tailwind directives. Ensure TypeScript compilation works with Svelte 5 runes syntax.",
+            "status": "done",
+            "testStrategy": "Verify all TypeScript files compile without errors, check Chrome API types are available and working, confirm TailwindCSS classes are properly processed and available in components",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-30T05:32:04.589Z"
+          },
+          {
+            "id": 5,
+            "title": "Create source directory structure and entry files",
+            "description": "Establish src/ directory structure with content/, background/, popup/, shared/ folders and create initial entry files",
+            "dependencies": [
+              2,
+              3
+            ],
+            "details": "Create src/ directory with subdirectories: content/ for content scripts, background/ for service worker, popup/ for extension popup, shared/ for common utilities. Create initial entry files: content-script.ts, background.ts, popup.html, Popup.svelte. Set up proper file imports and basic structure for each component.",
+            "status": "done",
+            "testStrategy": "Verify directory structure matches PRD specification, confirm all entry files are created and properly referenced in manifest.json and Vite config, test that extension loads with basic file structure",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-30T05:37:05.417Z"
+          }
+        ],
+        "updatedAt": "2025-10-30T05:37:05.417Z"
+      },
+      {
+        "id": "2",
+        "title": "Implement Content Script and Platform Detection",
+        "description": "Create content script system that detects current social media platform and communicates with popup",
+        "details": "Create content-script.ts that injects into all frames on target domains. Implement platform detection using window.location.hostname matching (facebook.com, instagram.com, linkedin.com). Use chrome.runtime.sendMessage() to communicate detected platform to popup. Set up message listener in content script to respond to popup queries. Handle SPA navigation by listening to popstate/pushstate events. Store current platform state and post detection status in content script.",
+        "testStrategy": "Test platform detection accuracy on each target site, verify message passing between content script and popup, test detection persistence during navigation within platform",
+        "priority": "high",
+        "dependencies": [
+          "1"
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create basic content script structure and file setup",
+            "description": "Set up the foundational content script file with TypeScript configuration and basic structure for platform detection system",
+            "dependencies": [],
+            "details": "Create content-script.ts in src/ directory with proper TypeScript types for chrome extension APIs. Set up basic file structure with imports for chrome.runtime messaging. Initialize base class or module structure that will house platform detection logic. Configure proper module exports and ensure script is ready for injection into web pages.",
+            "status": "pending",
+            "testStrategy": "Verify TypeScript compilation without errors and basic script loading in extension environment",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement platform detection logic using hostname matching",
+            "description": "Build the core platform detection functionality that identifies Facebook, Instagram, and LinkedIn based on current URL hostname",
+            "dependencies": [
+              1
+            ],
+            "details": "Create platform detection function that examines window.location.hostname and matches against supported platforms (facebook.com, instagram.com, linkedin.com including subdomains). Implement enum or constants for platform types. Add logic to handle edge cases like m.facebook.com, www.instagram.com variations. Store detected platform in local variable and provide getter method for current platform state.",
+            "status": "pending",
+            "testStrategy": "Unit test hostname matching logic with various URL formats and subdomain variations for each supported platform",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Set up chrome.runtime message communication system",
+            "description": "Implement bidirectional messaging between content script and popup using chrome.runtime.sendMessage and message listeners",
+            "dependencies": [
+              2
+            ],
+            "details": "Create message listener using chrome.runtime.onMessage.addListener() to handle requests from popup for current platform state. Implement sendMessage functionality to proactively notify popup when platform changes. Define message interface types for platform detection messages including message types, platform data, and response formats. Add error handling for failed message passing.",
+            "status": "pending",
+            "testStrategy": "Test message passing between content script and popup, verify message format consistency and error handling for disconnected popup",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Implement SPA navigation detection and handling",
+            "description": "Add listeners for single-page application navigation events to detect platform changes without page reload",
+            "dependencies": [
+              3
+            ],
+            "details": "Set up event listeners for popstate and pushstate events to detect URL changes in SPAs. Override history.pushState and history.replaceState methods to catch programmatic navigation. Implement debounced re-detection of platform when URL changes occur. Ensure platform state is updated and popup is notified when navigation occurs within the same tab without full page reload.",
+            "status": "pending",
+            "testStrategy": "Test platform detection updates during in-app navigation on Facebook, Instagram, and LinkedIn without page refreshes",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Add post detection status tracking and state management",
+            "description": "Implement system to track and store current platform state and post detection status within the content script",
+            "dependencies": [
+              4
+            ],
+            "details": "Create state management system to track current platform, detection timestamp, and post availability status. Implement periodic checks to validate that posts are still detectable on current page. Add methods to query post detection status for popup requests. Store state in content script memory with proper cleanup on navigation. Implement status change notifications to popup when post detection status changes.",
+            "status": "pending",
+            "testStrategy": "Verify state persistence during navigation, test status updates when posts become available/unavailable, validate cleanup on page transitions",
+            "parentId": "undefined"
+          }
+        ]
+      },
+      {
+        "id": "3",
+        "title": "Build DOM-based Social Media Post Parsers",
+        "description": "Implement platform-specific parsers to extract post data from DOM elements",
+        "details": "Create base parser interface with PostData type. Implement FacebookParser using selectors like '[data-pagelet=\"FeedUnit\"]', '[data-ad-preview=\"message\"]' for post content, '[data-testid=\"story-subtitle\"]' for author info. Build InstagramParser targeting '[data-testid=\"post\"]', 'article' containers, '._aatc img' for images. Develop LinkedInParser using '.feed-shared-update-v2', '.update-components-text' selectors. Each parser extracts: author name/URL, post content, timestamp, media URLs, engagement metrics. Use MutationObserver to detect when posts load dynamically. Implement robust error handling for missing elements.",
+        "testStrategy": "Unit test each parser with sample DOM structures, test parsing accuracy across different post types (text-only, image, multi-image), verify extraction of all required fields, test error handling with malformed posts",
+        "priority": "high",
+        "dependencies": [
+          "2"
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create base parser interface and PostData type definitions",
+            "description": "Define the foundational types and interfaces that all platform-specific parsers will implement",
+            "dependencies": [],
+            "details": "Create shared/types.ts with PostData interface containing platform, id, url, author (name, url, username), content (text, html), media array, and metadata (timestamp, likes, comments, shares). Define MediaItem interface with type, url, filename, and downloaded boolean. Create base parser abstract class with abstract methods for extracting post data, handling DOM mutations, and error recovery. Include platform detection and validation methods.",
+            "status": "pending",
+            "testStrategy": "Unit tests for type validation, interface compliance checking, and base parser method signatures",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement Facebook DOM parser with selectors and data extraction",
+            "description": "Build FacebookParser class to extract post data from Facebook's DOM structure using specific selectors",
+            "dependencies": [
+              1
+            ],
+            "details": "Create parsers/facebook.ts extending base parser. Implement DOM selectors for '[data-pagelet=\"FeedUnit\"]' post containers, '[data-ad-preview=\"message\"]' for content text, '[data-testid=\"story-subtitle\"]' for author information. Extract author name and profile URL, post timestamp from datetime attributes, image URLs from img elements within post containers. Handle engagement metrics from reaction/comment/share elements. Implement error handling for missing DOM elements and provide fallback selectors.",
+            "status": "pending",
+            "testStrategy": "Test with sample Facebook DOM structures, verify all required fields are extracted, test handling of different post types (text-only, single image, multiple images), validate error handling with malformed HTML",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Implement Instagram DOM parser with post and carousel detection",
+            "description": "Build InstagramParser class to handle Instagram's post structures including single images and carousel posts",
+            "dependencies": [
+              1
+            ],
+            "details": "Create parsers/instagram.ts extending base parser. Target '[data-testid=\"post\"]' and 'article' containers for post detection. Extract username and profile URL from header elements, caption text from content areas, timestamp from time elements. Handle image extraction from '._aatc img' selectors and carousel navigation elements. Parse hashtags and mentions within captions. Extract engagement metrics from like and comment count elements. Implement carousel detection for multi-image posts.",
+            "status": "pending",
+            "testStrategy": "Test single image posts, carousel posts with multiple images, text-only posts, verify hashtag and mention parsing, test engagement metric extraction accuracy",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Implement LinkedIn DOM parser for professional content",
+            "description": "Build LinkedInParser class to extract professional posts and shared content from LinkedIn's DOM",
+            "dependencies": [
+              1
+            ],
+            "details": "Create parsers/linkedin.ts extending base parser. Use '.feed-shared-update-v2' selectors for post containers and '.update-components-text' for content extraction. Handle both personal posts and company posts with different author extraction logic. Extract author name, profile URL, post content, and timestamp from appropriate elements. Parse engagement metrics including reactions, comments, and reposts. Handle shared articles and document attachments by extracting metadata and links.",
+            "status": "pending",
+            "testStrategy": "Test personal posts, company posts, shared articles, document attachments, verify professional content formatting, test engagement metric accuracy across different post types",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Implement MutationObserver for dynamic content detection",
+            "description": "Add dynamic post detection capabilities using MutationObserver to handle content that loads asynchronously",
+            "dependencies": [
+              2,
+              3,
+              4
+            ],
+            "details": "Integrate MutationObserver into each parser to detect when new posts are added to the DOM through infinite scroll or dynamic loading. Configure observer to watch for childList and subtree changes on main content containers. Implement throttling to prevent excessive parsing calls during rapid DOM changes. Add post deduplication logic to avoid re-processing the same posts. Include cleanup methods to disconnect observers when content script is unloaded. Handle platform-specific infinite scroll patterns and loading indicators.",
+            "status": "pending",
+            "testStrategy": "Test dynamic post detection during infinite scroll, verify deduplication prevents duplicate processing, test observer cleanup on page navigation, validate performance with rapid DOM changes",
+            "parentId": "undefined"
+          }
+        ]
+      },
+      {
+        "id": "4",
+        "title": "Create File System Access Integration",
+        "description": "Implement File System Access API integration for saving files directly to Obsidian vault",
+        "details": "Use window.showDirectoryPicker() for vault selection with {mode: 'readwrite'} options. Store DirectoryHandle using chrome.storage.local with proper serialization. Implement folder creation logic: vault/Social Archive/{Platform}/{YYYY}/{MM}/ structure using handle.getDirectoryHandle() with {create: true}. Create file-saver.ts service to handle FileSystemWritableFileStream operations. Implement automatic filename generation: '{YYYY-MM-DD} - {Author} - {Title}.md' with proper sanitization. Add proper error handling for permission denied, quota exceeded scenarios.",
+        "testStrategy": "Test vault selection flow, verify folder structure creation, test file writing with various filename edge cases, test permission persistence across browser sessions, verify error handling for inaccessible directories",
+        "priority": "high",
+        "dependencies": [
+          "1"
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement vault directory selection and permission handling",
+            "description": "Create vault selection service using File System Access API to allow users to choose their Obsidian vault directory",
+            "dependencies": [],
+            "details": "Implement window.showDirectoryPicker() with {mode: 'readwrite'} options. Create a VaultSelector service class that handles the directory picker interaction, validates the selected directory as a valid Obsidian vault (check for .obsidian folder), and manages user permission flow. Include proper error handling for user cancellation and permission denied scenarios.",
+            "status": "pending",
+            "testStrategy": "Test vault selection dialog appears correctly, verify permission validation, test user cancellation handling, verify vault validation logic",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Create DirectoryHandle storage and serialization system",
+            "description": "Implement persistent storage of DirectoryHandle using chrome.storage.local with proper serialization and deserialization",
+            "dependencies": [
+              1
+            ],
+            "details": "Create StorageService class to handle DirectoryHandle persistence using chrome.storage.local. Implement custom serialization since DirectoryHandle cannot be directly stored. Store vault path and re-request handle on extension restart. Add handle validation to ensure stored handles are still accessible and have proper permissions.",
+            "status": "pending",
+            "testStrategy": "Test handle persistence across browser sessions, verify serialization/deserialization works correctly, test permission validation on restored handles",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Build hierarchical folder structure creation logic",
+            "description": "Implement automatic folder creation following the vault/Social Archive/{Platform}/{YYYY}/{MM}/ structure",
+            "dependencies": [
+              2
+            ],
+            "details": "Create FolderManager class that uses handle.getDirectoryHandle() with {create: true} to build the required folder hierarchy. Implement date-based folder organization (YYYY/MM format). Add platform-specific folder creation (Facebook, Instagram, LinkedIn). Include error handling for quota exceeded and permission issues during folder creation.",
+            "status": "pending",
+            "testStrategy": "Test folder structure creation for each platform, verify date-based organization works correctly, test folder creation permissions, validate error handling for quota limits",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Develop file-saver service with stream operations",
+            "description": "Create file-saver.ts service to handle FileSystemWritableFileStream operations for writing markdown files to vault",
+            "dependencies": [
+              3
+            ],
+            "details": "Implement FileSaver class using FileSystemWritableFileStream for efficient file writing. Create methods for writing text content, handling large files, and managing stream lifecycle. Add proper error handling for write failures, permission issues, and stream errors. Implement file existence checking and overwrite protection.",
+            "status": "pending",
+            "testStrategy": "Test file writing with various content sizes, verify stream handling works correctly, test error scenarios like permission denied, validate overwrite protection logic",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Create filename generation and sanitization system",
+            "description": "Implement automatic filename generation with pattern '{YYYY-MM-DD} - {Author} - {Title}.md' and proper character sanitization",
+            "dependencies": [
+              4
+            ],
+            "details": "Create FilenameGenerator class that formats filenames using the specified pattern. Implement character sanitization to remove/replace invalid filesystem characters (< > : \" | ? * \\). Add duplicate filename handling with numeric suffixes. Include length validation to prevent overly long filenames and ensure cross-platform compatibility.",
+            "status": "pending",
+            "testStrategy": "Test filename generation with various special characters, verify sanitization removes invalid characters, test duplicate handling creates unique names, validate length limits work correctly",
+            "parentId": "undefined"
+          }
+        ]
+      },
+      {
+        "id": "5",
+        "title": "Implement Media Download and Storage System",
+        "description": "Build image downloading and local storage system with CORS handling and progress tracking",
+        "details": "Create MediaDownloader class using fetch() with {mode: 'cors'} for image retrieval. Implement fallback to chrome.runtime.sendMessage() to background script for CORS-blocked images. Use background script with chrome.downloads API as secondary approach. Generate unique filenames using timestamp + index pattern. Create attachments/ subfolder alongside markdown files. Implement retry logic with exponential backoff (max 3 attempts). Add download progress tracking using ReadableStream reader. Convert ArrayBuffer to Uint8Array for FileSystemWritableFileStream.write(). Support common formats: jpg, png, webp, gif.",
+        "testStrategy": "Test image downloads from each platform, verify CORS fallback mechanism, test progress tracking accuracy, verify unique filename generation, test retry logic with network failures, validate file integrity after download",
+        "priority": "high",
+        "dependencies": [
+          "4"
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create MediaDownloader class with CORS handling",
+            "description": "Implement the core MediaDownloader class that handles image downloads with proper CORS configuration and fallback mechanisms",
+            "dependencies": [],
+            "details": "Create MediaDownloader.ts class with fetch() implementation using {mode: 'cors'} for primary image retrieval. Implement fallback mechanism using chrome.runtime.sendMessage() to background script for CORS-blocked images. Include error handling for network failures and CORS restrictions. Set up proper TypeScript interfaces for download options and response handling.",
+            "status": "pending",
+            "testStrategy": "Test direct fetch downloads with CORS-enabled images, verify fallback mechanism triggers for CORS-blocked content, test error handling for network failures",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement background script download fallback with chrome.downloads API",
+            "description": "Create background script service that handles image downloads when CORS blocks direct fetch requests",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement background script message listener that receives download requests from content scripts. Use chrome.downloads API as secondary download approach for CORS-blocked images. Handle download completion events and communicate results back to requesting content script. Implement proper error handling and timeout mechanisms for background downloads.",
+            "status": "pending",
+            "testStrategy": "Test background script message handling, verify chrome.downloads API functionality, test communication between content script and background for blocked images",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Build unique filename generation and file path management",
+            "description": "Create system for generating unique filenames and managing attachment folder structure alongside markdown files",
+            "dependencies": [],
+            "details": "Implement filename generation using timestamp + index pattern to ensure uniqueness. Create attachments/ subfolder management alongside markdown files using File System Access API. Build filename sanitization for cross-platform compatibility. Support common image formats: jpg, png, webp, gif with proper extension handling.",
+            "status": "pending",
+            "testStrategy": "Test filename uniqueness across multiple downloads, verify attachments folder creation, test filename sanitization with special characters, validate file extension handling",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Implement retry logic with exponential backoff",
+            "description": "Add robust retry mechanism with exponential backoff for failed download attempts",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Implement retry logic with maximum 3 attempts using exponential backoff algorithm. Handle different failure types (network errors, CORS issues, server errors) with appropriate retry strategies. Include configurable delay intervals starting from 1 second, doubling on each retry. Add proper logging and error reporting for failed attempts.",
+            "status": "pending",
+            "testStrategy": "Test retry mechanism with simulated network failures, verify exponential backoff timing, test maximum retry limit enforcement, validate different error type handling",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Create download progress tracking with ReadableStream",
+            "description": "Implement real-time download progress tracking using ReadableStream reader and file writing with ArrayBuffer conversion",
+            "dependencies": [
+              3
+            ],
+            "details": "Implement download progress tracking using ReadableStream reader to monitor download completion percentage. Convert ArrayBuffer to Uint8Array for FileSystemWritableFileStream.write() operations. Create progress event system to communicate download status to UI components. Handle large file downloads with memory-efficient streaming.",
+            "status": "pending",
+            "testStrategy": "Test progress tracking accuracy with various file sizes, verify ArrayBuffer to Uint8Array conversion, test memory usage with large file downloads, validate progress event communication",
+            "parentId": "undefined"
+          }
+        ]
+      },
+      {
+        "id": "6",
+        "title": "Build Markdown Conversion Engine",
+        "description": "Create markdown formatter that converts parsed post data into Obsidian-compatible format",
+        "details": "Implement MarkdownConverter class with YAML frontmatter generation including platform, archived timestamp, url, author metadata. Create post content formatting with proper Obsidian wiki-link syntax for images: ![[attachments/filename.jpg]]. Preserve original text formatting including line breaks, hashtags (#example), mentions (@username). Generate engagement metrics section with emoji indicators. Add proper escaping for markdown special characters in content. Implement title generation from first 50 characters of post content. Use date-fns@2.30+ for timestamp formatting.",
+        "testStrategy": "Test markdown output format validation against Obsidian standards, verify wiki-link syntax correctness, test special character escaping, validate YAML frontmatter parsing, test with various post content types including empty posts",
+        "priority": "medium",
+        "dependencies": [
+          "3",
+          "5"
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement MarkdownConverter class with YAML frontmatter generation",
+            "description": "Create the core MarkdownConverter class that generates Obsidian-compatible YAML frontmatter with platform metadata",
+            "dependencies": [],
+            "details": "Create MarkdownConverter.ts class that generates YAML frontmatter including platform, archived timestamp, url, and author metadata. Install and configure date-fns@2.30+ for timestamp formatting. Implement frontmatter structure with proper YAML syntax including escaped values for special characters. Create interface for markdown output structure.",
+            "status": "pending",
+            "testStrategy": "Test YAML frontmatter generation with various post types, verify date formatting consistency, validate metadata escaping for special characters",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Create Obsidian wiki-link syntax formatter for images",
+            "description": "Implement image formatting with proper Obsidian wiki-link syntax for downloaded attachments",
+            "dependencies": [
+              1
+            ],
+            "details": "Build image formatter that converts image URLs to Obsidian wiki-link syntax: ![[attachments/filename.jpg]]. Handle multiple images in posts with proper spacing and formatting. Integrate with media download system to reference correct local filenames. Support common image formats (jpg, png, webp, gif) with proper extension handling.",
+            "status": "pending",
+            "testStrategy": "Test wiki-link generation for single and multiple images, verify filename matching with downloaded attachments, validate syntax correctness in Obsidian",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Implement content preservation and formatting system",
+            "description": "Build text content formatter that preserves original formatting including line breaks, hashtags, and mentions",
+            "dependencies": [
+              1
+            ],
+            "details": "Create content formatter that preserves line breaks, hashtags (#example), and mentions (@username) from original posts. Implement proper escaping for markdown special characters (* _ ` # + - . ! [ ] ( ) \\) in content while preserving intentional formatting. Handle platform-specific formatting differences (Instagram captions vs LinkedIn articles).",
+            "status": "pending",
+            "testStrategy": "Test content preservation with various formatting types, verify special character escaping doesn't break intentional formatting, validate hashtag and mention preservation",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Build engagement metrics section with emoji indicators",
+            "description": "Create engagement metrics formatter that displays likes, comments, and shares with appropriate emoji indicators",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement engagement metrics section that formats like counts, comment counts, and share counts with emoji indicators (❤️ for likes, 💬 for comments, 🔄 for shares). Handle platform-specific engagement types (Instagram hearts vs LinkedIn reactions). Create consistent formatting structure for metrics section at end of markdown file.",
+            "status": "pending",
+            "testStrategy": "Test engagement metrics formatting for each platform, verify emoji display consistency, validate metrics calculation accuracy",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Implement title generation and complete markdown assembly",
+            "description": "Create title generation from post content and assemble complete markdown files with all components",
+            "dependencies": [
+              2,
+              3,
+              4
+            ],
+            "details": "Implement title generation from first 50 characters of post content with proper truncation at word boundaries. Assemble complete markdown files combining YAML frontmatter, title, content formatting, image wiki-links, and engagement metrics. Handle edge cases like empty posts, posts with only images, and very long content. Ensure proper spacing and structure throughout the markdown file.",
+            "status": "pending",
+            "testStrategy": "Test title generation with various content lengths and types, verify complete markdown structure assembly, validate output against Obsidian standards",
+            "parentId": "undefined"
+          }
+        ]
+      },
+      {
+        "id": "7",
+        "title": "Develop Popup UI with Svelte 5 Runes",
+        "description": "Build responsive popup interface using Svelte 5 Runes API with real-time archiving progress",
+        "details": "Create Popup.svelte component using Svelte 5 $state runes for reactive state management. Implement three main screens: detection view, archiving progress, success confirmation. Use chrome.tabs.query() to get active tab and communicate with content script. Build ArchivingProgress component with progress bar using CSS animations. Implement error handling UI with user-friendly messages. Style with Tailwind CSS using utility classes for responsive design. Add platform-specific icons (Facebook blue, Instagram gradient, LinkedIn blue). Implement 'Open in Obsidian' functionality using custom protocol obsidian://open?path=. Create popup.html entry point with proper CSP headers.",
+        "testStrategy": "Test popup responsiveness across different screen sizes, verify real-time progress updates during archiving, test error state displays, validate platform detection accuracy in UI, test Obsidian deep-link functionality",
+        "priority": "medium",
+        "dependencies": [
+          "2",
+          "6"
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create popup.html entry point with Svelte 5 integration",
+            "description": "Build the main HTML entry point for the Chrome extension popup with proper CSP headers and Svelte 5 mounting",
+            "dependencies": [],
+            "details": "Create popup.html in src/ directory with proper DOCTYPE, meta charset, CSP headers for Chrome extension security. Include Tailwind CSS CDN or build process link. Create popup container div with proper dimensions (320x480px typical). Add script tag to load main popup.ts entry point. Configure CSP to allow inline styles needed for Tailwind and component styling. Set up proper viewport meta for responsive design.",
+            "status": "pending",
+            "testStrategy": "Verify popup opens correctly in Chrome extension environment, CSP headers don't block resources, proper dimensions render consistently",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement main Popup.svelte component with Svelte 5 runes",
+            "description": "Create the root Popup component using Svelte 5 $state runes for reactive state management across the three main screens",
+            "dependencies": [
+              1
+            ],
+            "details": "Create Popup.svelte component using Svelte 5 $state runes for screen management ($state({ currentScreen: 'detection' })). Implement three main screens: detection view, archiving progress, success confirmation. Use $state for platform detection, archiving status, and error states. Implement chrome.tabs.query() integration to get active tab information. Set up message passing with content script using chrome.runtime.sendMessage(). Handle screen transitions with smooth animations using Svelte transitions.",
+            "status": "pending",
+            "testStrategy": "Test state management with Svelte 5 runes, verify screen transitions work smoothly, validate chrome.tabs.query() functionality",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Build ArchivingProgress component with animated progress bar",
+            "description": "Create dedicated component for showing real-time archiving progress with CSS animations and status updates",
+            "dependencies": [
+              2
+            ],
+            "details": "Create ArchivingProgress.svelte component with $state rune for progress percentage. Implement animated progress bar using CSS transitions and Tailwind classes. Add status text updates for different archiving phases: 'Detecting post...', 'Extracting content...', 'Saving to vault...'. Include cancel button functionality. Use $state reactive statements to update progress based on messages from background script. Implement smooth progress bar animations with CSS transform and transition properties.",
+            "status": "pending",
+            "testStrategy": "Test progress bar animations render smoothly, verify real-time updates from background script, test cancel functionality",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Implement platform detection UI with platform-specific styling",
+            "description": "Create detection view component that shows current platform with appropriate icons and styling for Facebook, Instagram, and LinkedIn",
+            "dependencies": [
+              2
+            ],
+            "details": "Create DetectionView.svelte component that displays detected platform information. Implement platform-specific icons and colors: Facebook blue (#1877F2), Instagram gradient (linear-gradient from #E4405F to #FFA726), LinkedIn blue (#0A66C2). Add platform name display and archive button with platform-appropriate styling. Use Tailwind CSS utility classes for responsive design. Implement loading states while detecting platform. Add support for unsupported platform messaging.",
+            "status": "pending",
+            "testStrategy": "Verify platform detection accuracy in UI, test platform-specific styling renders correctly, validate responsive design across different popup sizes",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Create success confirmation screen with Obsidian integration",
+            "description": "Build success confirmation component with 'Open in Obsidian' functionality using custom protocol and error handling UI",
+            "dependencies": [
+              2
+            ],
+            "details": "Create SuccessView.svelte component showing archiving completion status. Implement 'Open in Obsidian' button using custom protocol obsidian://open?path= with proper file path generation. Add file path display showing where the archive was saved. Implement error handling UI with user-friendly error messages for common issues (vault not found, permission denied, file write errors). Add retry functionality for failed operations. Style with success green colors and proper spacing using Tailwind CSS classes.",
+            "status": "pending",
+            "testStrategy": "Test Obsidian deep-link functionality opens correct file, verify error state displays show appropriate messages, test retry functionality works correctly",
+            "parentId": "undefined"
+          }
+        ]
+      },
+      {
+        "id": "8",
+        "title": "Implement Settings Management and Extension Configuration",
+        "description": "Build settings page and storage system for vault configuration and user preferences",
+        "details": "Create Settings.svelte component with vault selection interface using File System Access API. Implement chrome.storage.sync for cross-device settings synchronization with ExtensionSettings interface. Build form controls for: vault path display, root folder customization (default: 'Social Archive'), folder structure radio options, filename format templating with variables {date}, {author}, {title}, {platform}. Add media settings: download toggle, attachments subfolder option, max file size slider (1-50MB). Implement settings validation and real-time preview of file paths. Use chrome.storage.onChanged listener for settings updates. Add export/import settings functionality for backup.",
+        "testStrategy": "Test settings persistence across browser restarts, verify cross-device sync functionality, validate folder structure preview accuracy, test settings import/export, verify file path validation with edge cases, test maximum file size enforcement",
+        "priority": "medium",
+        "dependencies": [
+          "4",
+          "7"
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create Settings.svelte Component with Vault Selection Interface",
+            "description": "Build the main settings page component with vault path selection using File System Access API",
+            "dependencies": [],
+            "details": "Create Settings.svelte component in src/popup/ directory with vault selection button using window.showDirectoryPicker(). Include current vault path display, form validation, and proper error handling for permission errors. Style with Tailwind CSS to match extension design.",
+            "status": "pending",
+            "testStrategy": "Test vault selection flow, verify folder picker opens correctly, test error handling for denied permissions, verify settings UI displays current vault path properly",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement ExtensionSettings Interface and Chrome Storage Sync",
+            "description": "Create settings data model and chrome.storage.sync integration for cross-device synchronization",
+            "dependencies": [
+              1
+            ],
+            "details": "Define ExtensionSettings interface in shared/types.ts with fields for vaultPath, rootFolder, folderStructure, filenameFormat, downloadImages, attachmentsSubfolder, maxImageSize. Implement chrome.storage.sync save/load functions with default values. Add storage change listeners for real-time updates.",
+            "status": "pending",
+            "testStrategy": "Test settings persistence across browser restarts, verify cross-device sync functionality, validate default values are applied correctly, test storage change event handling",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Build Form Controls for Folder Structure and File Naming",
+            "description": "Create interactive form controls for customizing folder organization and filename templates",
+            "dependencies": [
+              2
+            ],
+            "details": "Add root folder text input with validation (default: 'Social Archive'), radio button group for folder structure options (platform-year-month, platform, year-month, flat), filename format input with template variables {date}, {author}, {title}, {platform}. Include real-time preview of generated paths.",
+            "status": "pending",
+            "testStrategy": "Test all folder structure combinations, verify filename template variable substitution, validate folder name restrictions, test real-time path preview accuracy",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Implement Media Download Settings and Validation",
+            "description": "Create media-related settings controls with validation and file size constraints",
+            "dependencies": [
+              2
+            ],
+            "details": "Add checkbox for download images toggle, checkbox for attachments subfolder option, slider/input for max file size (1-50MB range). Implement settings validation to prevent invalid configurations. Add visual feedback for setting changes.",
+            "status": "pending",
+            "testStrategy": "Test media settings persistence, verify file size slider constraints, validate settings combinations, test download toggle functionality with real posts",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Add Settings Export/Import and Storage Change Listeners",
+            "description": "Implement settings backup/restore functionality and real-time change detection",
+            "dependencies": [
+              4
+            ],
+            "details": "Create export settings to JSON file functionality, import settings from JSON with validation, implement chrome.storage.onChanged listener for real-time settings updates across extension components. Add error handling for malformed import files.",
+            "status": "pending",
+            "testStrategy": "Test settings export creates valid JSON, verify import restores all settings correctly, test storage change listeners update UI in real-time, validate import error handling with corrupted files",
+            "parentId": "undefined"
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "version": "1.0.0",
+      "lastModified": "2025-10-30T05:37:05.417Z",
+      "taskCount": 8,
+      "completedCount": 1,
+      "tags": [
+        "master"
+      ]
+    }
+  }
+}

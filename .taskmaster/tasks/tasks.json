@@ -550,7 +550,7 @@
           "4",
           "7"
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -610,14 +610,15 @@
             "testStrategy": "Test settings export creates valid JSON, verify import restores all settings correctly, test storage change listeners update UI in real-time, validate import error handling with corrupted files",
             "parentId": "undefined"
           }
-        ]
+        ],
+        "updatedAt": "2025-10-30T08:21:46.260Z"
       }
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-30T07:51:19.032Z",
+      "lastModified": "2025-10-30T08:21:46.261Z",
       "taskCount": 8,
-      "completedCount": 7,
+      "completedCount": 8,
       "tags": [
         "master"
       ]

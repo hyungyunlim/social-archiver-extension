@@ -7,10 +7,12 @@
   import ArchivingProgress from './components/ArchivingProgress.svelte';
   import SuccessView from './components/SuccessView.svelte';
   import ErrorView from './components/ErrorView.svelte';
+  import Settings from './components/Settings.svelte';
 
   // View state
   let currentView: PopupView = $state('detection');
   let loading = $state(true);
+  let showSettings = $state(false);
 
   // Platform state
   let platformState: PlatformState = $state({
@@ -161,20 +163,35 @@
   function delay(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
+
+  function toggleSettings() {
+    showSettings = !showSettings;
+  }
 </script>
 
-<div class="w-96 min-h-[500px] bg-white dark:bg-gray-900">
+<div class="w-96 min-h-[500px] max-h-[600px] bg-white dark:bg-gray-900 flex flex-col">
   <!-- Header -->
-  <header class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-    <h1 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-      <span>📚</span>
-      <span>Social Archiver</span>
-    </h1>
+  <header class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+    <div class="flex items-center justify-between">
+      <h1 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+        <span>📚</span>
+        <span>Social Archiver</span>
+      </h1>
+      <button
+        onclick={toggleSettings}
+        class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-2xl transition-colors"
+        title="Settings"
+      >
+        ⚙️
+      </button>
+    </div>
   </header>
 
   <!-- Main Content -->
-  <main>
-    {#if loading}
+  <main class="flex-1 overflow-hidden">
+    {#if showSettings}
+      <Settings onClose={toggleSettings} />
+    {:else if loading}
       <div class="flex items-center justify-center py-16">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
       </div>

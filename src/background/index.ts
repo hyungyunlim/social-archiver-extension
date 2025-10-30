@@ -26,20 +26,37 @@ chrome.runtime.onInstalled.addListener(() => {
 
 // Listen for messages from content scripts or popup
 chrome.runtime.onMessage.addListener(
-  (message: ArchiveRequest, _sender, sendResponse: (response: ArchiveResponse) => void) => {
+  (message: any, _sender, sendResponse: (response: any) => void) => {
     console.log('Background received message:', message);
 
+    // Handle archive request (legacy format)
     if (message.postId && message.platform) {
-      // Handle archive request
-      handleArchiveRequest(message)
+      handleArchiveRequest(message as ArchiveRequest)
         .then((response) => sendResponse(response))
         .catch((error) => {
           console.error('Archive error:', error);
           sendResponse({ success: false, error: error.message });
         });
-
-      // Return true to indicate async response
       return true;
+    }
+
+    // Handle typed messages
+    if (message.type) {
+      switch (message.type) {
+        case 'DOWNLOAD_MEDIA':
+          handleMediaDownload(message.payload)
+            .then((response) => sendResponse(response))
+            .catch((error) => {
+              console.error('Download error:', error);
+              sendResponse({ success: false, error: error.message });
+            });
+          return true;
+
+        default:
+          console.warn('Unknown message type:', message.type);
+          sendResponse({ success: false, error: 'Unknown message type' });
+          return false;
+      }
     }
 
     return false;
@@ -66,6 +83,54 @@ async function handleArchiveRequest(request: ArchiveRequest): Promise<ArchiveRes
     };
   } catch (error) {
     console.error('Failed to archive post:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    };
+  }
+}
+
+/**
+ * Handle media download request from content script
+ * This provides a fallback for CORS-blocked images
+ */
+async function handleMediaDownload(payload: { url: string }): Promise<any> {
+  const { url } = payload;
+
+  try {
+    console.log('Background downloading media:', url);
+
+    // Fetch the media in background context (different CORS policy)
+    const response = await fetch(url, {
+      mode: 'cors',
+      credentials: 'omit',
+    });
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: `HTTP ${response.status}: ${response.statusText}`,
+      };
+    }
+
+    // Convert to blob
+    const blob = await response.blob();
+
+    // Convert blob to base64 data URL for transfer
+    const arrayBuffer = await blob.arrayBuffer();
+    const bytes = new Uint8Array(arrayBuffer);
+    const binary = bytes.reduce((acc, byte) => acc + String.fromCharCode(byte), '');
+    const base64 = btoa(binary);
+    const dataUrl = `data:${blob.type};base64,${base64}`;
+
+    return {
+      success: true,
+      dataUrl,
+      type: blob.type,
+      size: blob.size,
+    };
+  } catch (error) {
+    console.error('Background download failed:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',

@@ -29,6 +29,7 @@ export enum MessageType {
   // From content script to background
   ARCHIVE_POST = 'ARCHIVE_POST',
   PLATFORM_DETECTED = 'PLATFORM_DETECTED',
+  DOWNLOAD_MEDIA = 'DOWNLOAD_MEDIA',
 
   // From popup to content script
   GET_PLATFORM_INFO = 'GET_PLATFORM_INFO',
@@ -37,6 +38,7 @@ export enum MessageType {
   // Responses
   PLATFORM_INFO_RESPONSE = 'PLATFORM_INFO_RESPONSE',
   PAGE_STATUS_RESPONSE = 'PAGE_STATUS_RESPONSE',
+  DOWNLOAD_MEDIA_RESPONSE = 'DOWNLOAD_MEDIA_RESPONSE',
 }
 
 export interface Message<T = any> {

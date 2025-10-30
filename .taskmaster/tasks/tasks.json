@@ -322,7 +322,7 @@
         "dependencies": [
           "4"
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -330,9 +330,10 @@
             "description": "Implement the core MediaDownloader class that handles image downloads with proper CORS configuration and fallback mechanisms",
             "dependencies": [],
             "details": "Create MediaDownloader.ts class with fetch() implementation using {mode: 'cors'} for primary image retrieval. Implement fallback mechanism using chrome.runtime.sendMessage() to background script for CORS-blocked images. Include error handling for network failures and CORS restrictions. Set up proper TypeScript interfaces for download options and response handling.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test direct fetch downloads with CORS-enabled images, verify fallback mechanism triggers for CORS-blocked content, test error handling for network failures",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-30T07:08:22.096Z"
           },
           {
             "id": 2,
@@ -342,9 +343,10 @@
               1
             ],
             "details": "Implement background script message listener that receives download requests from content scripts. Use chrome.downloads API as secondary download approach for CORS-blocked images. Handle download completion events and communicate results back to requesting content script. Implement proper error handling and timeout mechanisms for background downloads.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test background script message handling, verify chrome.downloads API functionality, test communication between content script and background for blocked images",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-30T07:09:17.714Z"
           },
           {
             "id": 3,
@@ -352,9 +354,10 @@
             "description": "Create system for generating unique filenames and managing attachment folder structure alongside markdown files",
             "dependencies": [],
             "details": "Implement filename generation using timestamp + index pattern to ensure uniqueness. Create attachments/ subfolder management alongside markdown files using File System Access API. Build filename sanitization for cross-platform compatibility. Support common image formats: jpg, png, webp, gif with proper extension handling.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test filename uniqueness across multiple downloads, verify attachments folder creation, test filename sanitization with special characters, validate file extension handling",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-30T07:09:59.040Z"
           },
           {
             "id": 4,
@@ -365,9 +368,10 @@
               2
             ],
             "details": "Implement retry logic with maximum 3 attempts using exponential backoff algorithm. Handle different failure types (network errors, CORS issues, server errors) with appropriate retry strategies. Include configurable delay intervals starting from 1 second, doubling on each retry. Add proper logging and error reporting for failed attempts.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test retry mechanism with simulated network failures, verify exponential backoff timing, test maximum retry limit enforcement, validate different error type handling",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-30T07:10:00.042Z"
           },
           {
             "id": 5,
@@ -377,11 +381,13 @@
               3
             ],
             "details": "Implement download progress tracking using ReadableStream reader to monitor download completion percentage. Convert ArrayBuffer to Uint8Array for FileSystemWritableFileStream.write() operations. Create progress event system to communicate download status to UI components. Handle large file downloads with memory-efficient streaming.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test progress tracking accuracy with various file sizes, verify ArrayBuffer to Uint8Array conversion, test memory usage with large file downloads, validate progress event communication",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-30T07:10:01.044Z"
           }
-        ]
+        ],
+        "updatedAt": "2025-10-30T07:10:01.044Z"
       },
       {
         "id": "6",
@@ -607,9 +613,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-30T06:59:19.931Z",
+      "lastModified": "2025-10-30T07:10:01.044Z",
       "taskCount": 8,
-      "completedCount": 4,
+      "completedCount": 5,
       "tags": [
         "master"
       ]
